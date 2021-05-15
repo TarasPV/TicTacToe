@@ -8,24 +8,57 @@ import com.study.tools.Utils;
 
 public class StartApplication {
 
+    private final static String YES = "y";
+    private final static String NO = "n";
+
+    private static IGame currentlyGame;
+
     public static void main(String[] args) {
 
         Player[] players = initGamePlayers();
-        IGame currentlyGame = initTicTacToeGameBoard();
-
-        startGame(currentlyGame, players);
+        startGame(players);
     }
 
-    private static void startGame(IGame game, Player[] players) {
+    private static void startGame(Player[] players) {
+        currentlyGame = initTicTacToeGameBoard();
+
         System.out.println("The game is starting!");
-        game.printGameBoard();
+        currentlyGame.printGameBoard();
 
         do {
-            playerCourse(game, players);
-            game.printGameBoard();
-        } while (game.isGameStarted());
+            playerCourse(currentlyGame, players);
+            currentlyGame.printGameBoard();
+        } while (currentlyGame.isGameStarted());
 
-        game.showWinnerPlayer();
+        endGame(players);
+        restartGame(players);
+    }
+
+    private static void endGame(Player[] players) {
+        System.out.println("The game is end!");
+
+        String winner = currentlyGame.getWinnerPlayer(players);
+        if (winner != null) {
+            System.out.println("Winner is: " + winner);
+        } else {
+            System.out.println("The game ended in a draw");
+        }
+    }
+
+    private static void restartGame(Player[] players) {
+        String userChoice = Utils.getEnteredStringData("Do you want to play again?(" + YES + "/" + NO + "): ");
+        switch (userChoice) {
+            case YES:
+                startGame(players);
+                break;
+            case NO:
+                System.out.println("bye-bye!");
+                break;
+            default:
+                System.out.println("Sorry, I don't know about that meaning");
+                restartGame(players);
+
+        }
     }
 
     private static void playerCourse(IGame game, Player[] players) {

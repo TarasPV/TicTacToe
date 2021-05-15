@@ -8,7 +8,7 @@ public interface IGame {
 
     void printGameBoard();
 
-    void showWinnerPlayer();
+    String getWinnerPlayer(Player[] players);
 
     void enterUserData(Player player);
 }

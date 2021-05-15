@@ -4,6 +4,7 @@ import com.study.games.users.Player;
 import com.study.tools.Constants;
 import com.study.tools.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TicTacToe implements IGame {
@@ -17,6 +18,9 @@ public class TicTacToe implements IGame {
 
     @Override
     public boolean isGameStarted() {
+        if (detectWinnerType() != null)
+            return false;
+
         return !isBoardFilled();
     }
 
@@ -48,31 +52,67 @@ public class TicTacToe implements IGame {
     }
 
     @Override
-    public void showWinnerPlayer() {
-        System.out.println("The game is end!");
-        detectWinner();
+    public String getWinnerPlayer(Player[] players) {
+        return getWinnerNameFromType(detectWinnerType(), players);
     }
 
-    private void detectWinner() {
-//      TODO:: detect
-        printGameBoard();
-        for (int i = 0; i < gameBoard.length; i++) {
-            System.out.println("[" + i + "]: " + Arrays.toString(gameBoard[i]));
-            for (int j = 0; j < gameBoard[i].length; j++) {
-                if (gameBoard[0][j].equals(gameBoard[i][j])) {
-                    System.out.println("Its true [" + i + "]: " + Arrays.toString(gameBoard[i]));
+    private String getWinnerNameFromType(String winnerType, Player[] players) {
+        if (winnerType != null) {
+            for (Player player : players) {
+                if (winnerType.equals(String.valueOf(player.getTicTacToeType()))) {
+                    return player.getName();
                 }
             }
         }
+        return null;
     }
 
-    private boolean isEqualsValue(String[] array) {
-        for (String s : array) {
-            if (!s.equals(array[0])) {
-                return false;
+    private String detectWinnerType() {
+        ArrayList<String> horizontalArr;
+        ArrayList<String> verticalArr;
+        ArrayList<String> leftTopToRightBottomArr = new ArrayList<>();
+        ArrayList<String> rightTopToLeftBottomArr = new ArrayList<>();
+
+        String winnerType = null;
+
+        for (int i = 0; i < gameBoard.length; i++) {
+            horizontalArr = new ArrayList<>();
+            verticalArr = new ArrayList<>();
+            leftTopToRightBottomArr.add(gameBoard[i][i]);
+            rightTopToLeftBottomArr.add(gameBoard[i][gameBoard.length - 1 - i]);
+
+            for (int j = 0; j < gameBoard[i].length; j++) {
+                horizontalArr.add(gameBoard[i][j]);
+                verticalArr.add(gameBoard[j][i]);
+            }
+
+            winnerType = isEqualsValueType(gameBoard.length, horizontalArr);
+            if (winnerType != null)
+                break;
+            winnerType = isEqualsValueType(gameBoard.length, verticalArr);
+            if (winnerType != null)
+                break;
+            winnerType = isEqualsValueType(gameBoard.length, leftTopToRightBottomArr);
+            if (winnerType != null)
+                break;
+            winnerType = isEqualsValueType(gameBoard.length, rightTopToLeftBottomArr);
+            if (winnerType != null)
+                break;
+        }
+
+        return winnerType;
+    }
+
+    private String isEqualsValueType(int mainArrayLength, ArrayList<String> arrayList) {
+        if (arrayList.size() < mainArrayLength)
+            return null;
+
+        for (String value : arrayList) {
+            if (value.equals(Constants.EMPTY_BOARD_SYMBOL) || !arrayList.get(0).equals(value)) {
+                return null;
             }
         }
-        return true;
+        return arrayList.get(0);
     }
 
     private boolean isBoardCellEmpty(int x, int y) {
